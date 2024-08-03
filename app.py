@@ -13,7 +13,7 @@ model_path = f'model/{model_file_name}'
 # กำหนด AWS credentials โดยตรงในโค้ด
 aws_access_key_id = 'AKIAQKGGXRGHVXFZREWH'
 aws_secret_access_key = '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'
-region_name = 'ap-soundeast-1'
+region_name = 'ap-southeast-1'
 
 # ตรวจสอบว่าโฟลเดอร์ model มีอยู่หรือไม่ ถ้าไม่มีให้สร้าง
 if not os.path.exists('model'):
