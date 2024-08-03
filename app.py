@@ -10,12 +10,23 @@ bucket_name = 'my-watermelon-models'  # ใส่ชื่อ bucket ของ�
 model_file_name = 'watermelon_model.h5'  # ใส่ชื่อไฟล์โมเดลของคุณใน S3
 model_path = f'model/{model_file_name}'
 
+# กำหนด AWS credentials โดยตรงในโค้ด
+aws_access_key_id = 'AKIAQKGGXRGHVXFZREWH'
+aws_secret_access_key = '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'
+region_name = 'ap-soundeast-1'
+
 # ตรวจสอบว่าโฟลเดอร์ model มีอยู่หรือไม่ ถ้าไม่มีให้สร้าง
 if not os.path.exists('model'):
     os.makedirs('model')
 
 # ดาวน์โหลดโมเดลจาก S3 พร้อมจัดการข้อผิดพลาด
-s3 = boto3.client('s3')
+s3 = boto3.client(
+    's3',
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key,
+    region_name=region_name
+)
+
 try:
     if not os.path.exists(model_path):
         st.info(f"Downloading {model_file_name} from S3 bucket {bucket_name}...")
