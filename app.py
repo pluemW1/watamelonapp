@@ -52,7 +52,7 @@ except Exception as e:
     st.error(f"Error loading the model: {e}")
     st.stop()
 
-def preprocess_audio_file(file_path, target_length=862):
+def preprocess_audio_file(file_path, target_length=174):
     data, sample_rate = librosa.load(file_path)
     mfccs = librosa.feature.mfcc(y=data, sr=sample_rate, n_mfcc=40)
 
