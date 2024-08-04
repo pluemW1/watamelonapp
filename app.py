@@ -4,13 +4,14 @@ import librosa
 import tensorflow as tf
 import boto3
 import os
+import tarfile
 
 # กำหนดค่า AWS S3
-bucket_name = 'my-watermelon-models'  # ใส่ชื่อ bucket ของคุณ
-model_file_name = 'watermelon_model.h5'  # ใส่ชื่อไฟล์โมเดลของคุณใน S3
-model_path = f'model/{model_file_name}'
+bucket_name = 'my-watermelon-models'
+model_file_name = 'model_keras.tar.gz'
+model_file_path = 'model/model.keras'
 
-# กำหนด AWS credentials โดยตรงในโค้ด
+# กำหนด AWS credentials และ Region
 aws_access_key_id = 'AKIAQKGGXRGHVXFZREWH'
 aws_secret_access_key = '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'
 region_name = 'ap-southeast-1'
@@ -28,10 +29,14 @@ s3 = boto3.client(
 )
 
 try:
-    if not os.path.exists(model_path):
+    if not os.path.exists(model_file_path):
         st.info(f"Downloading {model_file_name} from S3 bucket {bucket_name}...")
-        s3.download_file(bucket_name, model_file_name, model_path)
+        s3.download_file(bucket_name, model_file_name, 'model/model_keras.tar.gz')
         st.success("Model downloaded successfully.")
+
+        # แยกไฟล์ที่บีบอัด
+        with tarfile.open('model/model_keras.tar.gz', 'r:gz') as tar:
+            tar.extractall(path='model/')
 except s3.exceptions.NoSuchBucket:
     st.error(f"The specified bucket does not exist: {bucket_name}")
 except s3.exceptions.NoSuchKey:
@@ -40,7 +45,12 @@ except Exception as e:
     st.error(f"An error occurred: {e}")
     st.stop()
 
-model = tf.keras.models.load_model(model_path)
+# เพิ่มการจัดการข้อผิดพลาดเมื่อโหลดโมเดล
+try:
+    model = tf.keras.models.load_model(model_file_path)
+except Exception as e:
+    st.error(f"Error loading the model: {e}")
+    st.stop()
 
 def preprocess_audio_file(file_path, target_length=862):
     data, sample_rate = librosa.load(file_path)
